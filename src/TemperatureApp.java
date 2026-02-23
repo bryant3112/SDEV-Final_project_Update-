@@ -1,46 +1,94 @@
-import java.util.Scanner;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /**
- * Console-based temperature application
+ * JavaFX GUI application for converting temperatures.
+ * This class connects the GUI to the Temperature logic classes.
  */
-public class TemperatureApp {
+public class TemperatureApp extends Application {
 
-    public static void main(String[] args) {
+    @Override
+    public void start(Stage stage) {
 
-        Scanner scanner = new Scanner(System.in);
+        // Window title
+        stage.setTitle("Temperature Converter");
 
-        System.out.print("Enter temperature value: ");
-        double value = scanner.nextDouble();
+        // Title label
+        Label titleLabel = new Label("Temperature Converter");
 
-        System.out.print("Enter unit (C, F, K): ");
-        String unit = scanner.next();
+        // Input field for temperature value
+        TextField temperatureField = new TextField();
+        temperatureField.setPromptText("Enter temperature");
 
-        if (!TemperatureValidator.isValidUnit(unit)) {
-            System.out.println("Invalid temperature unit.");
-            return;
-        }
+        // Dropdown for unit selection
+        ComboBox<String> unitBox = new ComboBox<>();
+        unitBox.getItems().addAll("C", "F");
+        unitBox.setValue("C");
 
-        Temperature temp = new Temperature(value, unit);
+        // Buttons
+        Button convertButton = new Button("Convert");
+        Button clearButton = new Button("Clear");
 
-        if (temp.getUnit().equals("C")) {
-            System.out.println("Fahrenheit: " +
-                TemperatureConverter.celsiusToFahrenheit(value));
-            System.out.println("Kelvin: " +
-                TemperatureConverter.celsiusToKelvin(value));
-        }
-        else if (temp.getUnit().equals("F")) {
-            System.out.println("Celsius: " +
-                TemperatureConverter.fahrenheitToCelsius(value));
-        }
-        else if (temp.getUnit().equals("K")) {
-            if (!TemperatureValidator.isValidKelvin(value)) {
-                System.out.println("Kelvin cannot be negative.");
-                return;
+        // Label to display results
+        Label resultLabel = new Label("Result will appear here");
+
+        // ---------- EVENT #1: Convert Button ----------
+        convertButton.setOnAction(e -> {
+            try {
+                double value = Double.parseDouble(temperatureField.getText());
+                String unit = unitBox.getValue();
+
+                // Validate unit
+                if (!TemperatureValidator.isValidUnit(unit)) {
+                    resultLabel.setText("Invalid unit selected");
+                    return;
+                }
+
+                // Create Temperature object
+                Temperature temp = new Temperature(value, unit);
+
+                // Convert temperature
+                Temperature converted = TemperatureConverter.convert(temp);
+
+                // Display result
+                resultLabel.setText(
+                        "Converted: " + converted.getValue() + " " + converted.getUnit()
+                );
+
+            } catch (NumberFormatException ex) {
+                resultLabel.setText("Please enter a valid number");
             }
-            System.out.println("Celsius: " +
-                TemperatureConverter.kelvinToCelsius(value));
-        }
+        });
 
-        scanner.close();
+        // ---------- EVENT #2: Clear Button ----------
+        clearButton.setOnAction(e -> {
+            temperatureField.clear();
+            unitBox.setValue("C");
+            resultLabel.setText("Result will appear here");
+        });
+
+        // Layout
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(
+                titleLabel,
+                temperatureField,
+                unitBox,
+                convertButton,
+                clearButton,
+                resultLabel
+        );
+
+        // Scene setup
+        Scene scene = new Scene(layout, 300, 300);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    // Launch application
+    public static void main(String[] args) {
+        launch(args);
     }
 }
