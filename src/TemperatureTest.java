@@ -1,6 +1,10 @@
+/**
+ * Tests Temperature class
+ */
 public class TemperatureTest {
 
     public static void main(String[] args) {
+
         Temperature temp = new Temperature(25, "c");
 
         assert temp.getValue() == 25;

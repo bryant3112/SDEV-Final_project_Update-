@@ -1,3 +1,6 @@
+/**
+ * Tests TemperatureValidator methods
+ */
 public class TemperatureValidatorTest {
 
     public static void main(String[] args) {
