@@ -1,76 +1,49 @@
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import java.util.Scanner;
 
 /**
- * Main JavaFX application for Temperature Converter
+ * Main application for temperature conversion
  */
-public class TemperatureApp extends Application {
-
-    @Override
-    public void start(Stage stage) {
-
-        stage.setTitle("Temperature Converter");
-
-        Label titleLabel = new Label("Temperature Converter");
-
-        TextField temperatureField = new TextField();
-        temperatureField.setPromptText("Enter temperature");
-
-        ComboBox<String> unitBox = new ComboBox<>();
-        unitBox.getItems().addAll("C", "F", "K");
-        unitBox.setValue("C");
-
-        Button convertButton = new Button("Convert");
-
-        Label resultLabel = new Label("Result will appear here");
-
-        convertButton.setOnAction(e -> {
-
-            try {
-
-                double value = Double.parseDouble(temperatureField.getText());
-                String unit = unitBox.getValue();
-
-                double result;
-
-                if (unit.equals("C")) {
-                    result = TemperatureConverter.celsiusToFahrenheit(value);
-                    resultLabel.setText(value + " C = " + result + " F");
-                }
-
-                else if (unit.equals("F")) {
-                    result = TemperatureConverter.fahrenheitToCelsius(value);
-                    resultLabel.setText(value + " F = " + result + " C");
-                }
-
-                else {
-                    result = TemperatureConverter.kelvinToCelsius(value);
-                    resultLabel.setText(value + " K = " + result + " C");
-                }
-
-            } catch (Exception ex) {
-                resultLabel.setText("Invalid number entered.");
-            }
-
-        });
-
-        VBox root = new VBox(10,
-                titleLabel,
-                temperatureField,
-                unitBox,
-                convertButton,
-                resultLabel);
-
-        Scene scene = new Scene(root, 400, 250);
-
-        stage.setScene(scene);
-        stage.show();
-    }
+public class TemperatureApp {
 
     public static void main(String[] args) {
-        launch();
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Temperature Converter");
+
+        System.out.print("Enter temperature value: ");
+        double value = scanner.nextDouble();
+
+        System.out.print("Enter unit (C, F, K): ");
+        String unit = scanner.next();
+
+        if (!TemperatureValidator.isValidUnit(unit)) {
+            System.out.println("Invalid unit.");
+            return;
+        }
+
+        double result;
+
+        if (unit.equalsIgnoreCase("C")) {
+            result = TemperatureConverter.celsiusToFahrenheit(value);
+            System.out.println(value + " C = " + result + " F");
+        }
+
+        else if (unit.equalsIgnoreCase("F")) {
+            result = TemperatureConverter.fahrenheitToCelsius(value);
+            System.out.println(value + " F = " + result + " C");
+        }
+
+        else {
+            if (!TemperatureValidator.isValidKelvin(value)) {
+                System.out.println("Kelvin cannot be negative.");
+                return;
+            }
+
+            result = TemperatureConverter.kelvinToCelsius(value);
+            System.out.println(value + " K = " + result + " C");
+        }
+
+        scanner.close();
     }
 }
